@@ -1,0 +1,80 @@
+list_data = [];
+
+function rndColor() {
+    var r = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // red
+        g = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2), // green
+        b = ('0' + Math.floor(Math.random() * 256).toString(16)).substr(-2); // blue
+    return '#' + r + g + b;
+}
+
+d3.csv("_final_2016.csv", function(data) {
+    var size_csv = data.length;
+    for (var i=0; i<size_csv; i++){
+        data_temporal = []
+        condicion_more_than_10 = parseFloat(data[i].times);
+        if (condicion_more_than_10>0){
+            data_temporal.push(data[i].id_origin);
+            data_temporal.push(data[i].id_destino);
+            data_temporal.push(parseFloat(data[i].times));
+            list_data.push(data_temporal);
+        }
+    }
+
+    var colors = {};
+
+    for (var i=0; i<list_data.length; i++){
+        colors[list_data[i][0]] = rndColor();
+    }
+
+
+    function _eval(){
+        // console.log('Hola prros@')
+    };
+
+    var sortOrder = [];
+    for (var i=0; i<list_data.length; i++){
+        sortOrder.push(list_data[i][1]);
+    }
+
+    function sort(a,b){ return d3.ascending(sortOrder.indexOf(b),sortOrder.indexOf(a)); }
+
+    ch = viz.ch().data(list_data)
+        .padding(.1)
+        .sort(sort)
+        .innerRadius(150)
+        .outerRadius(165)
+        .duration(1000)
+        .chordOpacity(0.4)
+        .labelPadding(.1)
+        .fill(function(d){ return colors[d];});
+
+
+    var tmp = ch.mouseover;
+    ch.mouseover = function(t){
+        tmp(t);
+        console.log(t.source);
+
+
+
+        // chart1.load({
+        //     columns: [
+        //         ['2014', 400, 300, 250, 100, 30, 100,20,10,200,10,100,400],
+        //         ['2015', 100, 100, 350, 40, 40, 100,20,70,24,40,2000,2000],
+        //     ]
+        // });
+    }
+
+    // ch.mouseout = function() {}
+
+    var width=700, height=700;
+    var cont=0;
+    var svg = d3.select("body").append("svg").attr("height",height).attr("width",width);
+    svg.append("g").attr("transform", "translate(370,350)").call(ch).on("click", function(d){
+        // console.log(list_data[cont][1])
+        // cont = cont+1;
+        // _eval();
+        // console.log(ch.source);
+    });
+    d3.select(self.frameElement).style("height", height+"px").style("width", width+"px");
+
+});
